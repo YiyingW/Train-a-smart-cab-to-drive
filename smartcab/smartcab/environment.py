@@ -17,7 +17,7 @@ class TrafficLight(object):
     def reset(self):
         self.last_updated = 0
 
-    def update(self, t):
+    def update(self, t):  
         if t - self.last_updated >= self.period:
             self.state = not self.state  # assuming state is boolean
             self.last_updated = t
@@ -29,7 +29,7 @@ class Environment(object):
     valid_actions = [None, 'forward', 'left', 'right']
     valid_inputs = {'light': TrafficLight.valid_states, 'oncoming': valid_actions, 'left': valid_actions, 'right': valid_actions}
     valid_headings = [(1, 0), (0, -1), (-1, 0), (0, 1)]  # ENWS
-    hard_time_limit = -100  # even if enforce_deadline is False, end trial when deadline reaches this value (to avoid deadlocks)
+    hard_time_limit = -10000  # even if enforce_deadline is False, end trial when deadline reaches this value (to avoid deadlocks)
 
     def __init__(self):
         self.done = False
@@ -55,7 +55,7 @@ class Environment(object):
                     self.roads.append((a, b))
 
         # Dummy agents
-        self.num_dummies = 3  # no. of dummy agents
+        self.num_dummies = 12  # no. of dummy agents
         for i in xrange(self.num_dummies):
             self.create_agent(DummyAgent)
 
@@ -238,7 +238,8 @@ class Agent(object):
 
 
 class DummyAgent(Agent):
-    color_choices = ['blue', 'cyan', 'magenta', 'orange']
+    color_choices = ['blue']
+    #color_choices = ['blue', 'cyan', 'magenta', 'orange']
 
     def __init__(self, env):
         super(DummyAgent, self).__init__(env)  # sets self.env = env, state = None, next_waypoint = None, and a default color

@@ -12,6 +12,8 @@ class LearningAgent(Agent):
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
         # TODO: Initialize any additional variables here
 
+
+
     def reset(self, destination=None):
         self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
@@ -19,13 +21,13 @@ class LearningAgent(Agent):
     def update(self, t):
         # Gather inputs
         self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
-        inputs = self.env.sense(self)
+        inputs = self.env.sense(self)  # self is the Agent object
         deadline = self.env.get_deadline(self)
 
         # TODO: Update state
-        
+        self.state = self.env.agent_states[self]
         # TODO: Select action according to your policy
-        action = None
+        action = random.choice([None, "forward", "left", "right"])
 
         # Execute action and get reward
         reward = self.env.act(self, action)
@@ -35,17 +37,19 @@ class LearningAgent(Agent):
         print "LearningAgent.update(): deadline = {}, inputs = {}, action = {}, reward = {}".format(deadline, inputs, action, reward)  # [debug]
 
 
+
+
 def run():
     """Run the agent for a finite number of trials."""
 
     # Set up environment and agent
     e = Environment()  # create environment (also adds some dummy traffic)
     a = e.create_agent(LearningAgent)  # create agent
-    e.set_primary_agent(a, enforce_deadline=True)  # specify agent to track
+    e.set_primary_agent(a, enforce_deadline=False)  # specify agent to track
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
     # Now simulate it
-    sim = Simulator(e, update_delay=0.5, display=True)  # create simulator (uses pygame when display=True, if available)
+    sim = Simulator(e, update_delay=1, display=True)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
     sim.run(n_trials=100)  # run for a specified number of trials
