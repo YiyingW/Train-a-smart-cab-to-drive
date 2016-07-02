@@ -2,6 +2,7 @@ import random
 from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
+from collections import namedtuple
 
 class LearningAgent(Agent):
     """An agent that learns to drive in the smartcab world."""
@@ -14,6 +15,7 @@ class LearningAgent(Agent):
 
 
 
+
     def reset(self, destination=None):
         self.planner.route_to(destination)
         # TODO: Prepare for a new trip; reset any variables here, if required
@@ -23,9 +25,13 @@ class LearningAgent(Agent):
         self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
         inputs = self.env.sense(self)  # self is the Agent object
         deadline = self.env.get_deadline(self)
+        agent_states = self.env.agent_states[self]
 
         # TODO: Update state
-        self.state = self.env.agent_states[self]
+        States = namedtuple("States", "Location Heading Destination Deadline Light Oncoming Left Right")
+        self.state = States(agent_states["location"],agent_states["heading"],agent_states["destination"],agent_states["deadline"],inputs.light,inputs.oncoming, inputs.left, inputs.right)
+
+
         # TODO: Select action according to your policy
         action = random.choice([None, "forward", "left", "right"])
 

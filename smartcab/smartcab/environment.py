@@ -1,6 +1,7 @@
 import time
 import random
 from collections import OrderedDict
+from collections import namedtuple
 
 from simulator import Simulator
 
@@ -103,7 +104,7 @@ class Environment(object):
             agent.reset(destination=(destination if agent is self.primary_agent else None))
 
     def step(self):
-        #print "Environment.step(): t = {}".format(self.t)  # [debug]
+        print "Environment.step(): t = {}".format(self.t)  # [debug]
 
         # Update traffic lights
         for intersection, traffic_light in self.intersections.iteritems():
@@ -149,8 +150,10 @@ class Environment(object):
             else:
                 if left != 'forward':  # we don't want to override left == 'forward'
                     left = other_heading
+        Situation = namedtuple("Situation", "light oncoming left right")
+        s = Situation(light, oncoming, left, right)
 
-        return {'light': light, 'oncoming': oncoming, 'left': left, 'right': right}  # TODO: make this a namedtuple
+        return s  # TODO: make this a namedtuple
 
     def get_deadline(self, agent):
         return self.agent_states[agent]['deadline'] if agent is self.primary_agent else None
@@ -172,12 +175,12 @@ class Environment(object):
             if light != 'green':
                 move_okay = False
         elif action == 'left':
-            if light == 'green' and (sense['oncoming'] == None or sense['oncoming'] == 'left'):
+            if light == 'green' and (sense.oncoming == None or sense.oncoming == 'left'):
                 heading = (heading[1], -heading[0])
             else:
                 move_okay = False
         elif action == 'right':
-            if light == 'green' or sense['left'] != 'straight':
+            if light == 'green' or sense.left != 'straight':
                 heading = (-heading[1], heading[0])
             else:
                 move_okay = False
@@ -251,13 +254,13 @@ class DummyAgent(Agent):
 
         action_okay = True
         if self.next_waypoint == 'right':
-            if inputs['light'] == 'red' and inputs['left'] == 'forward':
+            if inputs.light == 'red' and inputs.light == 'forward':
                 action_okay = False
         elif self.next_waypoint == 'forward':
-            if inputs['light'] == 'red':
+            if inputs.light == 'red':
                 action_okay = False
         elif self.next_waypoint == 'left':
-            if inputs['light'] == 'red' or (inputs['oncoming'] == 'forward' or inputs['oncoming'] == 'right'):
+            if inputs.light == 'red' or (inputs.oncoming == 'forward' or inputs.oncoming == 'right'):
                 action_okay = False
 
         action = None
