@@ -78,13 +78,15 @@ class LearningAgent(Agent):
 def main():
     """Run the agent for a finite number of trials."""
     # Set up environment and agent
-    file = open('Q.pickle', 'r')
+
+    file = open('Q_rewardV2.pickle', 'r')
     Q = pickle.load(file)
     file.close()
+
     e = Environment()  # create environment (also adds some dummy traffic)
     a = e.create_agent(LearningAgent)  # create agent
-    a.Q = Q
-    e.set_primary_agent(a, enforce_deadline=False)  # specify agent to track
+    #a.Q = Q
+    e.set_primary_agent(a, enforce_deadline=True)  # specify agent to track
 
     # NOTE: You can set enforce_deadline=False while debugging to allow longer trials
 
@@ -92,11 +94,11 @@ def main():
     sim = Simulator(e, update_delay=1, display=True)  # create simulator (uses pygame when display=True, if available)
     # NOTE: To speed up simulation, reduce update_delay and/or set display=False
 
-    sim.run(n_trials=1000)  # run for a specified number of trials
+    sim.run(n_trials=10000)  # run for a specified number of trials
     # NOTE: To quit midway, press Esc or close pygame window, or hit Ctrl+C on the command-line
    
 
-    f = open('Q.pickle', 'w')
+    f = open('Q_rewardV2.pickle', 'w')
     pickle.dump(a.Q, f)
     f.close()
 

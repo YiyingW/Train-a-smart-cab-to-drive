@@ -195,8 +195,10 @@ class Environment(object):
                 #if self.bounds[0] <= location[0] <= self.bounds[2] and self.bounds[1] <= location[1] <= self.bounds[3]:  # bounded
                 state['location'] = new_location
                 state['heading'] = heading
-                """ NEED TO CHANGE THIS !!!!!! *********************"""
-                reward = 5.0 if compute_dist(new_location, destination) < compute_dist(location, destination) else -2.0
+                if new_location != None and location != None and destination != None:
+                	reward = 5.0 if self.compute_dist(new_location, destination) < self.compute_dist(location, destination) else -2.0
+                else:
+                	reward = 0.0
                 
             else:
                 # Valid null move
