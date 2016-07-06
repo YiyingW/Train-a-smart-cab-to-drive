@@ -30,7 +30,7 @@ class Environment(object):
     valid_actions = [None, 'forward', 'left', 'right']
     valid_inputs = {'light': TrafficLight.valid_states, 'oncoming': valid_actions, 'left': valid_actions, 'right': valid_actions}
     valid_headings = [(1, 0), (0, -1), (-1, 0), (0, 1)]  # ENWS
-    hard_time_limit = -10000  # even if enforce_deadline is False, end trial when deadline reaches this value (to avoid deadlocks)
+    hard_time_limit = -100  # even if enforce_deadline is False, end trial when deadline reaches this value (to avoid deadlocks)
 
     def __init__(self):
         self.done = False
@@ -56,7 +56,7 @@ class Environment(object):
                     self.roads.append((a, b))
 
         # Dummy agents
-        self.num_dummies = 12  # no. of dummy agents
+        self.num_dummies = 3  # no. of dummy agents
         for i in xrange(self.num_dummies):
             self.create_agent(DummyAgent)
 
@@ -165,6 +165,7 @@ class Environment(object):
         state = self.agent_states[agent]
         location = state['location']
         heading = state['heading']
+        destination = state['destination']
         light = 'green' if (self.intersections[location].state and heading[1] != 0) or ((not self.intersections[location].state) and heading[0] != 0) else 'red'
         sense = self.sense(agent)
 
@@ -189,25 +190,28 @@ class Environment(object):
             # Valid move (could be null)
             if action is not None:
                 # Valid non-null move
-                location = ((location[0] + heading[0] - self.bounds[0]) % (self.bounds[2] - self.bounds[0] + 1) + self.bounds[0],
+                new_location = ((location[0] + heading[0] - self.bounds[0]) % (self.bounds[2] - self.bounds[0] + 1) + self.bounds[0],
                             (location[1] + heading[1] - self.bounds[1]) % (self.bounds[3] - self.bounds[1] + 1) + self.bounds[1])  # wrap-around
                 #if self.bounds[0] <= location[0] <= self.bounds[2] and self.bounds[1] <= location[1] <= self.bounds[3]:  # bounded
-                state['location'] = location
+                state['location'] = new_location
                 state['heading'] = heading
-                reward = 2.0 if action == agent.get_next_waypoint() else -0.5  # valid, but is it correct? (as per waypoint)
+                """ NEED TO CHANGE THIS !!!!!! *********************"""
+                reward = 5.0 if compute_dist(new_location, destination) < compute_dist(location, destination) else -2.0
+                
             else:
                 # Valid null move
                 reward = 0.0
         else:
             # Invalid move
-            reward = -1.0
+            reward = -3.0
 
         if agent is self.primary_agent:
             if state['location'] == state['destination']:
                 if state['deadline'] >= 0:
-                    reward += 10  # bonus
+                    reward += 20  # bonus
                 self.done = True
-                print "Environment.act(): Primary agent has reached destination!"  # [debug]
+                print "Environment.act(): Primary agent has reached destination!"
+                print "YAY**************^^__^^****************YAY"  # [debug]
             self.status_text = "state: {}\naction: {}\nreward: {}".format(agent.get_state(), action, reward)
             #print "Environment.act() [POST]: location: {}, heading: {}, action: {}, reward: {}".format(location, heading, action, reward)  # [debug]
 
