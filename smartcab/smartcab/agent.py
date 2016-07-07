@@ -14,10 +14,6 @@ class LearningAgent(Agent):
         self.planner = RoutePlanner(self.env, self)  # simple route planner to get next_waypoint
         # TODO: Initialize any additional variables here
         self.Q = {}
-        
-
-
-
 
     def reset(self, destination=None):
         self.planner.route_to(destination)
@@ -43,7 +39,6 @@ class LearningAgent(Agent):
 
     def update(self, t):
         # Gather inputs
-        self.next_waypoint = self.planner.next_waypoint()  # from route planner, also displayed by simulator
         inputs = self.env.sense(self)  # self is the Agent object
         deadline = self.env.get_deadline(self)
         agent_states = self.env.agent_states[self]
@@ -68,7 +63,7 @@ class LearningAgent(Agent):
 
         max_action = max(self.Q[(current_relative_loc, self.state.Heading, self.state.Light, self.state.Oncoming, self.state.Left, self.state.Right, None)],self.Q[(current_relative_loc, self.state.Heading, self.state.Light, self.state.Oncoming, self.state.Left, self.state.Right, 'forward')],self.Q[(current_relative_loc, self.state.Heading, self.state.Light, self.state.Oncoming, self.state.Left, self.state.Right, 'left')],self.Q[(current_relative_loc, self.state.Heading, self.state.Light, self.state.Oncoming, self.state.Left, self.state.Right, 'right')])
         action = random.choice([i for i in ['left', 'forward', 'right', None] if self.Q[(current_relative_loc, self.state.Heading, self.state.Light, self.state.Oncoming, self.state.Left, self.state.Right, i)] == max_action])
-        
+        self.next_waypoint = action  # from route planner, also displayed by simulator
         # Execute action and get reward
         reward = self.env.act(self, action)
 
